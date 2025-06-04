@@ -1,0 +1,10 @@
+streamlit
+PyPDF2
+python-dotenv
+langchain
+langchain-community
+transformers
+huggingface_hub==0.19.4  # Important: prevent 'post' error
+sentence-transformers
+faiss-cpu
+Cohere
