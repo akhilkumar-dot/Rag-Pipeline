@@ -1,37 +1,27 @@
-# 📄 PDF Question Answering Chatbot (RAG App)
+# 📄 PDF Question Answering Chatbot (RAG App with Telegram Bot + n8n Orchestration)
 
-An interactive Streamlit web app that lets you upload a PDF, extracts its content, and answers your questions using **LangChain**, **Cohere's command-r-plus**, **FAISS**, and **HuggingFace embeddings**. It features **real-time streamed answers**, making it feel like a true AI chat experience.
+An intelligent **Retrieval-Augmented Generation (RAG)** application that allows users to upload PDFs, extract content, and ask contextual questions — powered by **LangChain**, **Cohere**, **HuggingFace embeddings**, and **FAISS**.  
+In addition to a Streamlit web app, it integrates a **Telegram bot automated via n8n** for seamless real-time conversational document Q&A across platforms.
 
 ---
 
 ## 🚀 Features
 
-- 📤 Upload any PDF file
-- 🧠 Chunk the PDF and embed using HuggingFace transformers
-- 🔍 Store and retrieve relevant chunks using FAISS vector store
-- 🤖 Answer user questions using Cohere’s `command-r-plus` LLM
-- 💬 Real-time chat-style streamed responses
-- 🌐 Easy to deploy on Streamlit Cloud
+- 📤 **Upload PDFs** directly via Streamlit or Telegram bot  
+- 🧠 **Chunk and embed** text using HuggingFace Sentence Transformers  
+- 🪄 **Semantic search** powered by FAISS vector store  
+- 🤖 **Answer generation** using Cohere’s `command-r-plus` LLM through LangChain’s RAG pipeline  
+- 💬 **Real-time streaming responses** in chat-style interface  
+- ⚙️ **n8n Orchestration:**  
+  - Automates Telegram message reception, PDF upload handling, and API request flow  
+  - Cleans responses with AI Transform nodes to fix Telegram formatting issues  
+- 📱 **Telegram Bot Integration:**  
+  - Users can send messages or upload PDFs directly in Telegram  
+  - Bot forwards input to FastAPI `/chat` endpoint via n8n workflow  
+  - Receives and sends AI-generated answers instantly back to chat  
+- 🌐 **Deployment-ready** on Streamlit Cloud or Render
 
 ---
 
-## 🛠️ Tech Stack
+## 🧩 System Architecture
 
-| Layer        | Tool |
-|--------------|------|
-| Frontend UI  | Streamlit |
-| LLM          | Cohere (command-r-plus) |
-| Embeddings   | HuggingFace Sentence Transformers |
-| RAG Engine   | LangChain (RetrievalQA) |
-| Vector Store | FAISS |
-| PDF Parsing  | PyPDF |
-
----
-
-## 📦 Installation
-
-1. **Clone the Repository**
-
-```bash
-git clone https://github.com/your-username/pdf-qa-chatbot.git
-cd pdf-qa-chatbot
