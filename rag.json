@@ -1,0 +1,337 @@
+{
+  "name": "rag",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "a0bf9719-4272-46f6-ab3b-eda6f7b44fd8",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.text }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "de29f9bb-7e1c-4c87-8fd4-80f4503f823e",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -224,
+        144
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.answer }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "b7731f48-c34f-4418-8c82-7409595976c0",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        704,
+        368
+      ],
+      "webhookId": "2c133a40-af48-4106-bc1a-be6047840a89",
+      "typeVersion": 1.1,
+      "credentials": {
+        "telegramApi": {
+          "id": "6fF8Zh9HBYqE9GZI",
+          "name": "Telegram account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "updates": "={{ [\"message\"] }} , {{ [\"file\"] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -704,
+        144
+      ],
+      "id": "74a3e378-b080-424c-a33f-5ee0f43d79f1",
+      "name": "Telegram Trigger",
+      "webhookId": "e393cff5-890a-402c-a9a2-2f780854ee00",
+      "credentials": {
+        "telegramApi": {
+          "id": "6fF8Zh9HBYqE9GZI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rag-n8n",
+          "mode": "list",
+          "cachedResultName": "rag-n8n"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        -32
+      ],
+      "id": "b10baaed-2cb9-44f1-9958-bfa60afab992",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "HYFnK10TQEzRucog",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        176
+      ],
+      "id": "7ab62002-b1d2-49d6-9d81-3d9991c494ed",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "modelName": "embed-multilingual-v3.0"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsCohere",
+      "typeVersion": 1,
+      "position": [
+        320,
+        176
+      ],
+      "id": "79b6b09e-1b65-4d62-ac35-babae49ea7a9",
+      "name": "Embeddings Cohere",
+      "credentials": {
+        "cohereApi": {
+          "id": "Sd2dDIaXmnVLbYD4",
+          "name": "CohereApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "text",
+              "stringValue": "={{ $json?.message?.text || \"\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb389d53-3407-4cad-9ddd-f1aaaa6beee4",
+      "name": "file or Text",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -448,
+        144
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "076ad073-5d17-4826-8f5c-b99447d5a8da",
+      "name": "Get  File",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        160,
+        -32
+      ],
+      "webhookId": "ef3f120e-c212-45ff-99b5-b6a5a82598d8",
+      "typeVersion": 1.1,
+      "credentials": {
+        "telegramApi": {
+          "id": "6fF8Zh9HBYqE9GZI",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ad8ad8e8356f.ngrok-free.app/chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{ $json.message.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        368
+      ],
+      "id": "4f622440-2716-485b-bbf8-c625011c9c8f",
+      "name": "HTTP Request",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "instructions": "clean this answer in a way which can send to telegram without this error 'Bad Request: can't parse entities: Unsupported start tag \\\"br\\\" at byte offset 597'",
+        "codeGeneratedForPrompt": "clean this answer in a way which can send to telegram without this error 'Bad Request: can't parse entities: Unsupported start tag \\\"br\\\" at byte offset 597'",
+        "jsCode": "const items = $input.all();\nconst cleanedItems = items.map((item) => {\n  item.json.answer = item.json.answer.replace(/<br>/g, \"\\n\");\n  return item;\n});\nreturn cleanedItems;\n"
+      },
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        432,
+        368
+      ],
+      "id": "7bbe91e6-1736-44f9-8154-357d6c8d8e8c",
+      "name": "AI Transform"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get  File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "file or Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Cohere": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "file or Text": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get  File": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c07de94c-7162-427c-8d96-05e410a1904f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2335685aa2228555808314e63e5b29fbcd7e9c147f992d23a9f6d2a72debe697"
+  },
+  "id": "G7PJipf1zXQ2cbtx",
+  "tags": []
+}
